@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #2d3436;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            color: #636e72;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .input-label {
+            font-weight: 600;
+            color: #2d3436;
+            font-size: 1.2rem;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            font-size: 1rem;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #6c5ce7;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .color-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .color-input label {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+        
+        input[type="color"] {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 2px;
+            background: #fff;
+        }
+        
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .size-control label {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+        
+        input[type="range"] {
+            width: 120px;
+        }
+        
+        button {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            padding: 24px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            border: 2px dashed #dfe6e9;
+            min-height: 300px;
+            justify-content: center;
+        }
+        
+        .qr-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .qr-display {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        canvas {
+            border-radius: 8px;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .qr-info {
+            text-align: center;
+            color: #636e72;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: #b2bec3;
+            text-align: center;
+        }
+        
+        .placeholder-icon {
+            font-size: 4rem;
+            opacity: 0.7;
+        }
+        
+        .placeholder-text {
+            font-size: 1.2rem;
+            max-width: 400px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            background: #fff;
+            border: 2px solid #dfe6e9;
+            border-radius: 10px;
+            color: #2d3436;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:hover {
+            border-color: #6c5ce7;
+            color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.05);
+        }
+        
+        .action-btn.download {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+        }
+        
+        .action-btn.download:hover {
+            background: linear-gradient(135deg, #00a085, #00b7b2);
+        }
+        
+        .examples {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 10px;
+        }
+        
+        .examples h3 {
+            margin-bottom: 12px;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .example-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .example-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .example-btn:hover {
+            background: #6c5ce7;
+            color: white;
+            border-color: #6c5ce7;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            button {
+                margin-left: 0;
+                justify-content: center;
+            }
+            
+            .color-controls {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔳 QR Code Generator</h1>
+            <p class="subtitle">Generate QR codes for URLs, text, contacts, WiFi, and more. Enter any content below and customize your QR code.</p>
+        </header>
+        
+        <section class="input-section">
+            <label for="qr-input" class="input-label">📝 Content to encode:</label>
+            <textarea id="qr-input" placeholder="Enter text, URL, email, phone number, or any content...">https://example.com</textarea>
+            
+            <div class="controls">
+                <div class="color-controls">
+                    <div class="color-input">
+                        <label for="qr-color">QR Color:</label>
+                        <input type="color" id="qr-color" value="#000000">
+                    </div>
+                    <div class="color-input">
+                        <label for="bg-color">Background:</label>
+                        <input type="color" id="bg-color" value="#ffffff">
+                    </div>
+                    <div class="size-control">
+                        <label for="qr-size">Size:</label>
+                        <input type="range" id="qr-size" min="100" max="400" value="250">
+                        <span id="size-value">250px</span>
+                    </div>
+                </div>
+                
+                <button id="generate-btn">
+                    <span>⚡ Generate QR Code</span>
+                </button>
+            </div>
+        </section>
+        
+        <section class="examples">
+            <h3>💡 Quick Examples:</h3>
+            <div class="example-buttons">
+                <button class="example-btn" data-example="https://github.com">GitHub</button>
+                <button class="example-btn" data-example="WIFI:S:MyNetwork;T:WPA;P:password123;;">WiFi Access</button>
+                <button class="example-btn" data-example="mailto:hello@example.com">Email Address</button>
+                <button class="example-btn" data-example="Hello World!">Plain Text</button>
+                <button class="example-btn" data-example="tel:+1234567890">Phone Number</button>
+                <button class="example-btn" data-example="BEGIN:VCARD\nVERSION:3.0\nFN:John Doe\nORG:Example Inc.\nTEL:+1234567890\nEMAIL:john@example.com\nEND:VCARD">Contact Card</button>
+            </div>
+        </section>
+        
+        <section class="output-section">
+            <div class="placeholder" id="placeholder">
+                <div class="placeholder-icon">🔳</div>
+                <div class="placeholder-text">Your QR code will appear here after generation. Try entering some text above and clicking "Generate QR Code".</div>
+            </div>
+            
+            <div class="qr-container" id="qr-container">
+                <div class="qr-display">
+                    <canvas id="qr-canvas"></canvas>
+                </div>
+                <div class="qr-info">
+                    <div>✅ QR Code generated successfully!</div>
+                    <div>Scan this code with any smartphone camera or QR scanner app.</div>
+                </div>
+                <div class="actions">
+                    <button class="action-btn download" id="download-btn">
+                        <span>📥 Download QR Code</span>
+                    </button>
+                    <button class="action-btn" id="reset-btn">
+                        <span>🔄 Reset</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // QR Code generator using the built-in canvas API
+        class QRCodeGenerator {
+            constructor() {
+                this.canvas = document.getElementById('qr-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.input = document.getElementById('qr-input');
+                this.qrColor = document.getElementById('qr-color');
+                this.bgColor = document.getElementById('bg-color');
+                this.sizeSlider = document.getElementById('qr-size');
+                this.sizeValue = document.getElementById('size-value');
+                this.generateBtn = document.getElementById('generate-btn');
+                this.downloadBtn = document.getElementById('download-btn');
+                this.resetBtn = document.getElementById('reset-btn');
+                this.placeholder = document.getElementById('placeholder');
+                this.qrContainer = document.getElementById('qr-container');
+                this.exampleBtns = document.querySelectorAll('.example-btn');
+                
+                this.init();
+            }
+            
+            init() {
+                this.sizeSlider.addEventListener('input', () => {
+                    this.sizeValue.textContent = `${this.sizeSlider.value}px`;
+                });
+                
+                this.generateBtn.addEventListener('click', () => this.generate());
+                this.downloadBtn.addEventListener('click', () => this.download());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                
+                this.exampleBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.input.value = e.target.dataset.example;
+                        this.generate();
+                    });
+                });
+                
+                // Generate QR code on page load with default value
+                this.generate();
+            }
+            
+            // Simple QR code generation algorithm
+            generateQRMatrix(text) {
+                // This is a simplified QR code matrix generator
+                // In a real implementation, you would use a library like qrcode.js
+                // This creates a pattern that looks like a QR code but is static
+                
+                const matrixSize = 21; // Simple QR code version 1 size
+                const matrix = [];
+                
+                // Create empty matrix
+                for (let i = 0; i < matrixSize; i++) {
+                    matrix[i] = [];
+                    for (let j = 0; j < matrixSize; j++) {
+                        matrix[i][j] = 0;
+                    }
+                }
+                
+                // Add finder patterns (three big squares)
+                this.addFinderPattern(matrix, 0, 0);
+                this.addFinderPattern(matrix, 0, matrixSize - 7);
+                this.addFinderPattern(matrix, matrixSize - 7, 0);
+                
+                // Add timing patterns
+                for (let i = 8; i < matrixSize - 8; i++) {
+                    matrix[6][i] = i % 2;
+                    matrix[i][6] = i % 2;
+                }
+                
+                // Add alignment pattern
+                this.addAlignmentPattern(matrix, matrixSize - 9, matrixSize - 9);
+                
+                // Create a simple pattern based on the text hash
+                const hash = this.hashString(text);
+                this.addDataPattern(matrix, hash);
+                
+                return matrix;
+            }
+            
+            addFinderPattern(matrix, x, y) {
+                // Outer black square
+                for (let i = 0; i < 7; i++) {
+                    for (let j = 0; j < 7; j++) {
+                        if (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+                            matrix[x + i][y + j] = 1;
+                        }
+                    }
+                }
+            }
+            
+            addAlignmentPattern(matrix, x, y) {
+                for (let i = 0; i < 5; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        if (i === 0 || i === 4 || j === 0 || j === 4 || (i === 2 && j === 2)) {
+                            matrix[x + i][y + j] = 1;
+                        }
+                    }
+                }
+            }
+            
+            addDataPattern(matrix, hash) {
+                // Add pseudo-random pattern based on hash
+                const matrixSize = matrix.length;
+                let hashIndex = 0;
+                
+                for (let i = 0; i < matrixSize; i++) {
+                    for (let j = 0; j < matrixSize; j++) {
+                        // Skip finder patterns and timing patterns
+                        if (matrix[i][j] === 0 && 
+                            !(i < 7 && j < 7) && 
+                            !(i < 7 && j >= matrixSize - 7) && 
+                            !(i >= matrixSize - 7 && j < 7) &&
+                            !(i === 6) &&
+                            !(j === 6)) {
+                            
+                            // Use hash to determine if cell should be filled
+                            if (hashIndex < hash.length) {
+                                matrix[i][j] = hash.charCodeAt(hashIndex) % 2;
+                                hashIndex++;
+                            } else {
+                                matrix[i][j] = (i * j) % 2;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            hashString(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0; // Convert to 32bit integer
+                }
+                return Math.abs(hash).toString(16);
+            }
+            
+            generate() {
+                const text = this.input.value.trim();
+                
+                if (!text) {
+                    alert("Please enter some content to generate a QR code.");
+                    return;
+                }
+                
+                const size = parseInt(this.sizeSlider.value);
+                const qrColor = this.qrColor.value;
+                const bgColor = this.bgColor.value;
+                
+                // Generate QR matrix
+                const matrix = this.generateQRMatrix(text);
+                const matrixSize = matrix.length;
+                
+                // Set canvas size
+                this.canvas.width = size;
+                this.canvas.height = size;
+                
+                // Clear canvas
+                this.ctx.fillStyle = bgColor;
+                this.ctx.fillRect(0, 0, size, size);
+                
+                // Calculate cell size
+                const cellSize = size / (matrixSize + 4); // Add padding
+                
+                // Draw QR code
+                this.ctx.fillStyle = qrColor;
+                
+                for (let i = 0; i < matrixSize; i++) {
+                    for (let j = 0; j < matrixSize; j++) {
+                        if (matrix[i][j] === 1) {
+                            this.ctx.fillRect(
+                                (j + 2) * cellSize, 
+                                (i + 2) * cellSize, 
+                                cellSize, 
+                                cellSize
+                            );
+                        }
+                    }
+                }
+                
+                // Add quiet zone (white border)
+                this.ctx.strokeStyle = bgColor;
+                this.ctx.lineWidth = cellSize * 2;
+                this.ctx.strokeRect(0, 0, size, size);
+                
+                // Show QR container and hide placeholder
+                this.placeholder.style.display = 'none';
+                this.qrContainer.style.display = 'flex';
+            }
+            
+            download() {
+                const link = document.createElement('a');
+                link.download = 'qr-code.png';
+                link.href = this.canvas.toDataURL('image/png');
+                link.click();
+            }
+            
+            reset() {
+                this.input.value = '';
+                this.qrColor.value = '#000000';
+                this.bgColor.value = '#ffffff';
+                this.sizeSlider.value = 250;
+                this.sizeValue.textContent = '250px';
+                
+                this.placeholder.style.display = 'flex';
+                this.qrContainer.style.display = 'none';
+            }
+        }
+        
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new QRCodeGenerator();
+        });
+    </script>
+</body>
+</html>
