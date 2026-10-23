@@ -13,7 +13,7 @@
     <!-- PWA basic assets -->
     <link rel="icon" type="image/png" href="icon.png" />
     <link rel="apple-touch-icon" href="icon.png" />
-    <meta name="theme-color" content="#10111b" />
+    <meta name="theme-color" content="#000000" />
     <link rel="manifest" href="manifest.json" />
 
     <!-- Optional: manifest -->
@@ -82,6 +82,78 @@
         @media(max-width:760px){body{padding-left:12px;padding-right:12px}.topbar{padding:14px 2px 22px}.workspace{grid-template-columns:1fr}.panel{padding:18px}.preview-panel{position:static;grid-row:1}.output-section{min-height:300px}.hero{margin-bottom:18px}.hero p{font-size:.91rem}.preview-panel .section-head{margin-bottom:13px}}
         @media(max-width:420px){.brand-mark{width:41px;height:41px;border-radius:13px}.brand-sub{font-size:.69rem}.install-btn{padding:9px 11px;font-size:.76rem}.panel{padding:15px;border-radius:19px}.color-grid{gap:7px}.color-tile{padding:8px}.color-tile label{font-size:.67rem}.output-section{padding:12px;min-height:280px}.qr-display{padding:10px}.actions{grid-template-columns:1fr}.action-btn{padding:13px}}
         @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+
+        /* PURE-BLACK NEON APP REDESIGN */
+        :root{--bg:#000000;--panel:#050609;--panel2:#090b11;--line:#202635;--muted:#9ba5b8;--text:#f7f9ff;--accent:#9b7bff;--accent2:#42f5e7;--radius:24px;color-scheme:dark}
+        html,body{background:#000!important}
+        body{position:relative;isolation:isolate;overflow-x:hidden;background:#000!important;padding-top:env(safe-area-inset-top);}
+        body:before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:linear-gradient(rgba(90,105,145,.065) 1px,transparent 1px),linear-gradient(90deg,rgba(90,105,145,.065) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,black,transparent 92%);animation:gridDrift 24s linear infinite}
+        body:after{content:"";position:fixed;width:520px;height:520px;top:-310px;left:calc(50% - 260px);z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(112,71,255,.22),rgba(30,232,220,.07) 40%,transparent 70%);filter:blur(18px);animation:orbPulse 7s ease-in-out infinite alternate}
+        @keyframes gridDrift{from{background-position:0 0}to{background-position:38px 38px}}
+        @keyframes orbPulse{0%{transform:scale(.82);opacity:.65}100%{transform:scale(1.18);opacity:1}}
+        @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes neonBreath{0%,100%{box-shadow:0 0 0 rgba(66,245,231,0),0 0 0 rgba(155,123,255,0)}50%{box-shadow:0 0 24px rgba(66,245,231,.12),0 0 42px rgba(155,123,255,.1)}}
+        @keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+        @keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.72)}}
+        @keyframes scanLine{0%{top:8%;opacity:0}12%{opacity:.9}85%{opacity:.8}100%{top:92%;opacity:0}}
+        .app-shell{max-width:1160px;position:relative}
+        .topbar{padding:23px 3px 38px;animation:riseIn .7s both}
+        .brand-mark{position:relative;overflow:hidden;background:#080910;border:1px solid rgba(66,245,231,.42);box-shadow:0 0 22px rgba(66,245,231,.12),inset 0 0 18px rgba(155,123,255,.15);border-radius:16px}
+        .brand-mark:after{content:"";position:absolute;inset:-60%;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.24) 50%,transparent 60%);transform:translateX(-60%);animation:brandShine 5s ease-in-out infinite}
+        @keyframes brandShine{0%,65%{transform:translateX(-70%)}100%{transform:translateX(70%)}}
+        .brand-mark img{filter:drop-shadow(0 0 7px rgba(66,245,231,.38))}
+        .brand-name{letter-spacing:.035em;font-size:1.08rem}.brand-sub{color:#818ca3;letter-spacing:.035em}
+        .install-btn{background:#07090e;border-color:#30394b;transition:.25s;box-shadow:inset 0 0 0 1px rgba(66,245,231,.035)}
+        .install-btn:hover{border-color:var(--accent2);box-shadow:0 0 20px rgba(66,245,231,.12);transform:translateY(-2px)}
+        .hero{padding:10px 3px 28px;animation:riseIn .75s .08s both}
+        .eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--accent2);font-size:.69rem;letter-spacing:.22em}
+        .eyebrow:before{content:"";width:20px;height:1px;background:var(--accent2);box-shadow:0 0 10px var(--accent2)}
+        h1{font-size:clamp(2.4rem,7vw,5rem);letter-spacing:-.065em;line-height:.99;margin:17px 0 15px;max-width:800px}
+        h1:after{content:"";display:inline-block;width:9px;height:9px;margin:0 0 7px 12px;border-radius:50%;background:var(--accent2);box-shadow:0 0 16px var(--accent2);animation:dotPulse 2s infinite}
+        .hero p{max-width:620px;color:#939bb0;font-size:1.02rem}
+        .workspace{gap:20px;align-items:stretch}
+        .panel{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(7,9,14,.98),rgba(2,3,6,.99));border:1px solid #202635;border-radius:24px;padding:25px;box-shadow:0 18px 70px #000, inset 0 1px 0 rgba(255,255,255,.025);animation:riseIn .8s .16s both;transition:border-color .25s,transform .25s}
+        .panel:before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--accent2),var(--accent),transparent);opacity:.62}
+        .panel:hover{border-color:#333c52}
+        .preview-panel{animation-delay:.24s}
+        .section-title{font-size:1rem;letter-spacing:.015em}.step{color:#b7a7ff;background:#120f22;border:1px solid #3d2d68;letter-spacing:.09em}
+        .mode-switch{background:#030407;border:1px solid #202635;border-radius:14px}
+        .mode-btn{transition:background .25s,color .25s,box-shadow .25s;border-radius:10px}
+        .mode-btn.active{background:linear-gradient(110deg,rgba(155,123,255,.2),rgba(66,245,231,.08));color:#fff;box-shadow:inset 0 0 0 1px rgba(155,123,255,.38),0 0 22px rgba(155,123,255,.07)}
+        textarea{background:#030407;border-color:#252b3a;border-radius:15px;transition:border-color .22s,box-shadow .22s;min-height:140px}
+        textarea:focus{border-color:#8c76ff;box-shadow:0 0 0 3px rgba(155,123,255,.1),0 0 25px rgba(155,123,255,.07)}
+        .helper{color:#7d879d}
+        .color-tile{background:#030407;border-color:#222939;border-radius:14px;transition:border-color .2s,transform .2s}
+        .color-tile:hover{border-color:#4b5570;transform:translateY(-2px)}
+        .controls-title{color:#dfe4f4;letter-spacing:.03em}
+        input[type=range]{accent-color:var(--accent2)}#size-value{color:var(--accent2)}
+        .primary-btn{position:relative;overflow:hidden;margin-top:23px;border:1px solid rgba(66,245,231,.55);background:linear-gradient(110deg,#9b7bff,#6854d9 45%,#19bcb5);background-size:200% 100%;box-shadow:0 0 25px rgba(105,84,217,.18),inset 0 1px 0 rgba(255,255,255,.18);border-radius:14px;transition:background-position .5s,transform .2s,box-shadow .2s}
+        .primary-btn:before{content:"";position:absolute;top:-40%;bottom:-40%;left:-30%;width:18%;transform:rotate(18deg);background:rgba(255,255,255,.25);filter:blur(8px);animation:buttonSweep 4.5s ease-in-out infinite}
+        @keyframes buttonSweep{0%,55%{left:-30%}100%{left:120%}}
+        .primary-btn:hover{background-position:100% 50%;box-shadow:0 0 32px rgba(66,245,231,.17),0 0 48px rgba(155,123,255,.12);transform:translateY(-2px)}
+        .example-btn{background:#05070b;border-color:#242b3a;color:#aeb8cd;transition:.2s}
+        .example-btn:hover{border-color:var(--accent2);color:#f5ffff;background:#071111;box-shadow:0 0 17px rgba(66,245,231,.07);transform:translateY(-1px)}
+        .live-pill{position:relative;background:#04100f;border:1px solid #16413e;color:#73fff0;letter-spacing:.1em}
+        .live-pill:before{animation:dotPulse 1.8s infinite}
+        .output-section{position:relative;overflow:hidden;min-height:365px;background:#020304;border:1px solid #242a39;border-radius:19px}
+        .output-section:before{content:"";position:absolute;left:8%;right:8%;height:1px;top:0;background:linear-gradient(90deg,transparent,#42f5e7,transparent);opacity:.45;animation:shimmer 6s linear infinite;background-size:200% 100%}
+        .output-section:after{content:"";position:absolute;left:0;right:0;top:0;height:25%;background:linear-gradient(180deg,transparent,rgba(66,245,231,.045),transparent);pointer-events:none;animation:scanLine 7s linear infinite}
+        .placeholder{position:relative;z-index:1}.placeholder-icon{width:78px;height:78px;display:grid;place-items:center;font-size:2.8rem;border-radius:24px;color:var(--accent2);border:1px solid #263b45;background:radial-gradient(circle at 50% 0,rgba(66,245,231,.1),#050609 70%);box-shadow:0 0 35px rgba(66,245,231,.07);animation:neonBreath 4s infinite}
+        .placeholder-text{color:#8994aa}
+        .qr-container{position:relative;z-index:1}
+        .qr-display{border-radius:18px;box-shadow:0 0 0 1px rgba(66,245,231,.18),0 0 35px rgba(66,245,231,.09),0 18px 40px #000;padding:13px}
+        .qr-info{color:#8e9bb0}.qr-info strong{letter-spacing:.02em}
+        .action-btn{transition:transform .2s,box-shadow .2s,border-color .2s}
+        .action-btn.download{background:linear-gradient(110deg,#42f5e7,#23bba9);box-shadow:0 0 20px rgba(66,245,231,.13);color:#001312}
+        .action-btn.download:hover{box-shadow:0 0 28px rgba(66,245,231,.26);transform:translateY(-2px)}
+        .action-btn.secondary{background:#05070b;border-color:#303749;color:#c7d0e3}
+        .action-btn.secondary:hover{border-color:#9b7bff;box-shadow:0 0 20px rgba(155,123,255,.1)}
+        .preview-note{color:#657188}
+        .footer{color:#505b70;letter-spacing:.025em}
+        .toast{background:#06090e;border-color:#314052;box-shadow:0 0 28px rgba(66,245,231,.1)}
+        @media(max-width:760px){.topbar{padding-bottom:29px}.hero{padding-bottom:20px}.workspace{gap:14px}.panel{padding:19px}.preview-panel{grid-row:1}.output-section{min-height:300px}}
+        @media(max-width:420px){.topbar{padding-top:16px}.hero{padding-left:2px}.hero p{font-size:.9rem}.panel{padding:15px}.output-section{min-height:270px}.placeholder-icon{width:68px;height:68px;border-radius:21px}}
+        @media(prefers-reduced-motion:reduce){body:before,body:after,.brand-mark:after,h1:after,.primary-btn:before,.output-section:after,.output-section:before,.placeholder-icon,.live-pill:before{animation:none!important}}
     </style>
 </head>
 <body>

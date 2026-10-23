@@ -1,4 +1,4 @@
-const CACHE_NAME = "anyqr-studio-v1";
+const CACHE_NAME = "anyqr-studio-v2";
 const APP_SHELL = ["./", "./index.html", "./manifest.json", "./icon.png", "./logo.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
