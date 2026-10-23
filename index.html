@@ -87,8 +87,8 @@
         :root{--bg:#000000;--panel:#050609;--panel2:#090b11;--line:#202635;--muted:#9ba5b8;--text:#f7f9ff;--accent:#9b7bff;--accent2:#42f5e7;--radius:24px;color-scheme:dark}
         html,body{background:#000!important}
         body{position:relative;isolation:isolate;overflow-x:hidden;background:#000!important;padding-top:env(safe-area-inset-top);}
-        body:before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:linear-gradient(rgba(90,105,145,.065) 1px,transparent 1px),linear-gradient(90deg,rgba(90,105,145,.065) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(to bottom,black,transparent 92%);animation:gridDrift 24s linear infinite}
-        body:after{content:"";position:fixed;width:520px;height:520px;top:-310px;left:calc(50% - 260px);z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(112,71,255,.22),rgba(30,232,220,.07) 40%,transparent 70%);filter:blur(18px);animation:orbPulse 7s ease-in-out infinite alternate}
+        body:before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:#000}
+        body:after{content:"";position:fixed;width:360px;height:360px;top:-280px;left:calc(50% - 180px);z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(112,71,255,.09),transparent 68%);filter:blur(22px);animation:orbPulse 7s ease-in-out infinite alternate}
         @keyframes gridDrift{from{background-position:0 0}to{background-position:38px 38px}}
         @keyframes orbPulse{0%{transform:scale(.82);opacity:.65}100%{transform:scale(1.18);opacity:1}}
         @keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
@@ -147,11 +147,14 @@
         .action-btn.download{background:linear-gradient(110deg,#42f5e7,#23bba9);box-shadow:0 0 20px rgba(66,245,231,.13);color:#001312}
         .action-btn.download:hover{box-shadow:0 0 28px rgba(66,245,231,.26);transform:translateY(-2px)}
         .action-btn.secondary{background:#05070b;border-color:#303749;color:#c7d0e3}
+        .action-btn.share{background:linear-gradient(110deg,#171b2b,#0b1019);border:1px solid #555080;color:#e8e4ff;box-shadow:inset 0 0 16px rgba(155,123,255,.06)}
+        .action-btn.share:hover{border-color:#9b7bff;box-shadow:0 0 22px rgba(155,123,255,.15)}
+        .qr-display{animation:neonBreath 4.5s ease-in-out infinite}
         .action-btn.secondary:hover{border-color:#9b7bff;box-shadow:0 0 20px rgba(155,123,255,.1)}
         .preview-note{color:#657188}
         .footer{color:#505b70;letter-spacing:.025em}
         .toast{background:#06090e;border-color:#314052;box-shadow:0 0 28px rgba(66,245,231,.1)}
-        @media(max-width:760px){.topbar{padding-bottom:29px}.hero{padding-bottom:20px}.workspace{gap:14px}.panel{padding:19px}.preview-panel{grid-row:1}.output-section{min-height:300px}}
+        @media(max-width:760px){.topbar{padding-bottom:29px}.hero{padding-bottom:20px}.workspace{display:flex;flex-direction:column;gap:14px}.editor-panel{order:1}.preview-panel{order:2;position:static}.panel{padding:19px}.output-section{min-height:300px}}
         @media(max-width:420px){.topbar{padding-top:16px}.hero{padding-left:2px}.hero p{font-size:.9rem}.panel{padding:15px}.output-section{min-height:270px}.placeholder-icon{width:68px;height:68px;border-radius:21px}}
         @media(prefers-reduced-motion:reduce){body:before,body:after,.brand-mark:after,h1:after,.primary-btn:before,.output-section:after,.output-section:before,.placeholder-icon,.live-pill:before{animation:none!important}}
     </style>
@@ -211,7 +214,8 @@
                         <div class="qr-display"><div id="qr-render"></div></div>
                         <div class="qr-info"><strong>QR code is ready</strong>Scan it with your phone camera or QR scanner.</div>
                         <div class="actions">
-                            <button class="action-btn download" id="download-btn" type="button"><span aria-hidden="true">↓</span> Download PNG</button>
+                            <button class="action-btn download" id="download-btn" type="button"><span aria-hidden="true">↓</span> Save PNG</button>
+                            <button class="action-btn share" id="share-btn" type="button"><span aria-hidden="true">↗</span> Share QR</button>
                             <button class="action-btn secondary" id="reset-btn" type="button"><span aria-hidden="true">↺</span> Start over</button>
                         </div>
                     </div>
@@ -240,6 +244,7 @@
                 this.sizeValue = document.getElementById('size-value');
                 this.generateBtn = document.getElementById('generate-btn');
                 this.downloadBtn = document.getElementById('download-btn');
+                this.shareBtn = document.getElementById('share-btn');
                 this.resetBtn = document.getElementById('reset-btn');
                 this.placeholder = document.getElementById('placeholder');
                 this.qrContainer = document.getElementById('qr-container');
@@ -279,6 +284,7 @@
 
                 this.generateBtn.addEventListener('click', () => this.generate());
                 this.downloadBtn.addEventListener('click', () => this.download());
+                this.shareBtn.addEventListener('click', () => this.shareQR());
                 this.resetBtn.addEventListener('click', () => this.reset());
 
                 this.exampleBtns.forEach(btn => {
@@ -486,6 +492,51 @@
                     this.downloadBtn.style.opacity = '';
                     this.downloadBtn.innerHTML = buttonText;
                 });
+            }
+
+            async shareQR() {
+                if (!this.qr) {
+                    this.showToast('Generate a QR code first.');
+                    return;
+                }
+                const data = this.getDataToEncode();
+                const filename = 'anyqr-code.png';
+                const original = this.shareBtn.innerHTML;
+                this.shareBtn.disabled = true;
+                this.shareBtn.style.opacity = '.7';
+                try {
+                    const blob = await this.qr.getRawData('png');
+                    if (!blob) throw new Error('QR image could not be created');
+                    const file = new File([blob], filename, { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({ title: 'My QR code', text: 'Created with AnyQR Studio', files: [file] });
+                        this.showToast('QR shared successfully.');
+                    } else if (navigator.share) {
+                        await navigator.share({ title: 'My QR code', text: `QR content: ${data}` });
+                        this.showToast('Share sheet opened. This browser cannot attach the QR image here, so share the encoded content or use Save PNG.');
+                    } else {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+                        this.showToast('Direct sharing is not supported in this browser. QR PNG saved instead.');
+                    }
+                } catch (error) {
+                    if (error && error.name === 'AbortError') {
+                        this.showToast('Share cancelled.');
+                    } else {
+                        console.error('QR share failed:', error);
+                        this.showToast('Sharing failed. Try Save PNG and share the image from Photos or Files.');
+                    }
+                } finally {
+                    this.shareBtn.disabled = false;
+                    this.shareBtn.style.opacity = '';
+                    this.shareBtn.innerHTML = original;
+                }
             }
 
             showToast(message) {
